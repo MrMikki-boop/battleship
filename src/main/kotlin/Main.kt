@@ -1,5 +1,7 @@
 package org.example
 
+import kotlin.random.Random
+
 fun main() {
     val playerField = Array(10) { Array(10) { 0 } }
     val computerField = Array(10) { Array(10) { 0 } }
@@ -26,4 +28,16 @@ fun printField(field: Array<Array<Int>>) {
         }
         println()
     }
+}
+
+fun placeShips(field: Array<Array<Int>>) {
+    // TODO: реализовать функцию расстановки кораблей
+}
+
+fun canPlaceShip(field: Array<Array<Int>>, shipLength: Int): Boolean {
+    // TODO: реализовать функцию проверки возможности расстановки корабля
+}
+
+fun placeShip(field: Array<Array<Int>>, shipLength: Int) {
+    // TODO: реализовать функцию расстановки корабля
 }
