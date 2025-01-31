@@ -12,6 +12,7 @@ fun main() {
     printField(playerField)
 
     while (true) {
+        printField(computerField)
         println("Введите координаты для стрельбы (например, А1):")
         val input = readlnOrNull()?.trim() ?: ""
 
@@ -23,6 +24,11 @@ fun main() {
         } else {
             println("Некорректные координаты")
         }
+
+        printField(computerField)
+
+        computerShoots(playerField)
+        printField(playerField)
     }
 }
 
@@ -137,3 +143,37 @@ fun shootAt(field: Array<IntArray>, row: Int, col: Int) {
         }
     }
 }
+
+fun computerShoots(field: Array<IntArray>) {
+    while (true) {
+        val row = Random.nextInt(10)
+        val col = Random.nextInt(10)
+
+        if (field[row][col] == 8 || field[row][col] == 9) {
+            continue
+        }
+
+        println("Компьютер стреляет в ${toLetter(col)}${row + 1}")
+
+        when (field[row][col]) {
+            1 -> {
+                println("Компьютер попадает!")
+                Thread.sleep(500)
+                field[row][col] = 8
+            }
+
+            0, 2 -> {
+                println("Компьютер промахивается!")
+                Thread.sleep(500)
+                field[row][col] = 9
+            }
+        }
+        break
+    }
+}
+
+fun toLetter(col: Int): Char {
+    val letters = "АБВГДЕЖЗИК"
+    return letters[col]
+}
+
