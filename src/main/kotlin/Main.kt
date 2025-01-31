@@ -12,7 +12,7 @@ fun main() {
     placeShips(computerField)
 
     while (true) {
-        printField(computerField)
+        printGameState(playerField, computerField)
         println("Введите координаты для стрельбы (например, А1):")
         val input = readlnOrNull()?.trim() ?: ""
 
@@ -29,7 +29,7 @@ fun main() {
             continue
         }
 
-        printField(computerField)
+        printGameState(playerField, computerField)
 
         computerShoots(playerField)
 
@@ -38,28 +38,28 @@ fun main() {
             break
         }
 
-        printField(playerField)
+        printGameState(playerField, computerField)
     }
 }
 
-fun printField(field: Array<IntArray>) {
-    val header = "   А Б В Г Д Е Ж З И К"
+fun printField(field: Array<IntArray>, hideShips: Boolean = false) {
+    val header = "    А Б В Г Д Е Ж З И К"
     println(header)
 
     for (i in field.indices) {
-        print("${i + 1}".padStart(2) + " ")
+        print("${i + 1}".padStart(2) + "| ")
         for (cell in field[i]) {
             val symbol = when (cell) {
                 0 -> "." // пустая ячейка
-                1 -> "#" // корабль
-                2 -> "*" // запретная зона (для отладки)
+                1 -> if (hideShips) "." else "#" // корабль противника
+                2 -> "." // запретная зона (для отладки)
                 8 -> "X" // попадание
                 9 -> "o" // промах
                 else -> "?"
             }
             print("$symbol ")
         }
-        println()
+        println("|")
     }
 }
 
@@ -194,4 +194,12 @@ fun isGameOver(field: Array<IntArray>): Boolean {
         }
     }
     return true
+}
+
+fun printGameState(playerField: Array<IntArray>, computerField: Array<IntArray>) {
+    println("\nВаше поле:")
+    printField(playerField, hideShips = false)
+
+    println("\nПоле противника:")
+    printField(computerField, hideShips = true)
 }
