@@ -51,8 +51,8 @@ fun printField(field: Array<IntArray>, hideShips: Boolean = false) {
         for (cell in field[i]) {
             val symbol = when (cell) {
                 0 -> "." // пустая ячейка
-                1 -> if (hideShips) "." else "#" // корабль противника
-                2 -> "." // запретная зона (для отладки)
+                1 -> if (hideShips) "." else "#" // корабль противника. Чтобы включить чит - заменить на: "1 -> "#""
+                2 -> "." // запретная зона (для отладки). TODO: убрать
                 8 -> "X" // попадание
                 9 -> "o" // промах
                 else -> "?"
