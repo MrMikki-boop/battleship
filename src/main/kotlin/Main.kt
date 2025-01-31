@@ -10,10 +10,20 @@ fun main() {
 
     placeShips(playerField)
     printField(playerField)
+
+    println("Введите координаты для стрельбы (например, А1):")
+    val input = readlnOrNull()?.trim() ?: ""
+
+    val coordinates = parseCoordinates(input)
+    if (coordinates != null) {
+        println("Вы стреляете в координаты ${coordinates.first + 1}, ${coordinates.second + 1}")
+    } else {
+        println("Некорректные координаты")
+    }
 }
 
 fun printField(field: Array<IntArray>) {
-    val header = "  А Б В Г Д Е Ж З И К"
+    val header = "   А Б В Г Д Е Ж З И К"
     println(header)
 
     for (i in field.indices) {
@@ -87,4 +97,18 @@ fun placeShip(field: Array<IntArray>, row: Int, col: Int, size: Int, horizontal:
         val c = if (horizontal) col + i else col
         field[r][c] = 1
     }
+}
+
+fun parseCoordinates(input: String): Pair<Int, Int>? {
+    if (input.length !in 2..3) return null
+
+    val letters = "АБВГДЕЖЗИК"
+    val letter = input[0].uppercaseChar()
+    val number = input.drop(1).toIntOrNull() ?: return null
+
+    val x = letters.indexOf(letter)
+    val y = number - 1
+
+    if (x == -1 || y == -1) return null
+    return Pair(x, y)
 }
