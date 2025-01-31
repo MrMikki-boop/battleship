@@ -17,14 +17,15 @@ fun printField(field: Array<IntArray>) {
     println(header)
 
     for (i in field.indices) {
-        print("${i + 1} ".padEnd(2))
+        print("${i + 1}".padStart(2) + " ")
         for (cell in field[i]) {
             val symbol = when (cell) {
-                0 -> "." // пустая ячейка
+                0 -> "." // пустая ячейка
                 1 -> "#" // корабль
+                2 -> "*" // запретная зона (для отладки)
                 8 -> "X" // попадание
                 9 -> "o" // промах
-                else -> " "
+                else -> "?"
             }
             print("$symbol ")
         }
@@ -58,22 +59,8 @@ fun canPlaceShip(field: Array<IntArray>, row: Int, col: Int, size: Int, horizont
             return false
         }
     }
-    return true
-}
 
-
-fun placeShip(field: Array<IntArray>, row: Int, col: Int, size: Int, horizontal: Boolean) {
-    for (i in 0 until size) {
-        val r = if (horizontal) row else row + i
-        val c = if (horizontal) col + i else col
-        field[r][c] = 1
-    }
-    markRestrictedArea(field, row, col, size, horizontal)
-}
-
-fun markRestrictedArea(field: Array<IntArray>, row: Int, col: Int, size: Int, horizontal: Boolean) {
     val offset = listOf(-1, 0, 1)
-
     for (i in 0 until size) {
         val r = if (horizontal) row else row + i
         val c = if (horizontal) col + i else col
@@ -83,10 +70,21 @@ fun markRestrictedArea(field: Array<IntArray>, row: Int, col: Int, size: Int, ho
                 val nr = r + dr
                 val nc = c + dc
 
-                if (nr in 0..9 && nc in 0..9 && field[nr][nc] == 0) {
-                    field[nr][nc] = 2
+                if (nr in 0..9 && nc in 0..9 && field[nr][nc] == 1) {
+                    return false
                 }
             }
         }
+    }
+
+    return true
+}
+
+
+fun placeShip(field: Array<IntArray>, row: Int, col: Int, size: Int, horizontal: Boolean) {
+    for (i in 0 until size) {
+        val r = if (horizontal) row else row + i
+        val c = if (horizontal) col + i else col
+        field[r][c] = 1
     }
 }
