@@ -9,7 +9,7 @@ fun main() {
     println("Добро пожаловать в игру \"Морской бой\"!")
 
     placeShips(playerField)
-    printField(playerField)
+    placeShips(computerField)
 
     while (true) {
         printField(computerField)
@@ -19,8 +19,6 @@ fun main() {
         val coordinates = parseCoordinates(input)
         if (coordinates != null) {
             shootAt(computerField, coordinates.first, coordinates.second)
-            println("\nКомпьютер стреляет: ")
-            printField(computerField)
 
             if (isGameOver(computerField)) {
                 println("Вы победили! Поздравляем!")
@@ -28,6 +26,7 @@ fun main() {
             }
         } else {
             println("Некорректные координаты")
+            continue
         }
 
         printField(computerField)
@@ -130,8 +129,8 @@ fun parseCoordinates(input: String): Pair<Int, Int>? {
     val x = letters.indexOf(letter)
     val y = number - 1
 
-    if (x == -1 || y == -1) return null
-    return Pair(x, y)
+    if (x == -1 || y !in 0..9) return null
+    return Pair(y, x)
 }
 
 fun shootAt(field: Array<IntArray>, row: Int, col: Int) {
@@ -190,8 +189,9 @@ fun toLetter(col: Int): Char {
 
 fun isGameOver(field: Array<IntArray>): Boolean {
     for (row in field) {
-        if (row.contains(1))
+        if (row.contains(1)) {
             return false
+        }
     }
     return true
 }
