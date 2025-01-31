@@ -11,14 +11,18 @@ fun main() {
     placeShips(playerField)
     printField(playerField)
 
-    println("Введите координаты для стрельбы (например, А1):")
-    val input = readlnOrNull()?.trim() ?: ""
+    while (true) {
+        println("Введите координаты для стрельбы (например, А1):")
+        val input = readlnOrNull()?.trim() ?: ""
 
-    val coordinates = parseCoordinates(input)
-    if (coordinates != null) {
-        println("Вы стреляете в координаты ${coordinates.first + 1}, ${coordinates.second + 1}")
-    } else {
-        println("Некорректные координаты")
+        val coordinates = parseCoordinates(input)
+        if (coordinates != null) {
+            shootAt(computerField, coordinates.first, coordinates.second)
+            println("\nКомпьютер стреляет: ")
+            printField(computerField)
+        } else {
+            println("Некорректные координаты")
+        }
     }
 }
 
@@ -111,4 +115,25 @@ fun parseCoordinates(input: String): Pair<Int, Int>? {
 
     if (x == -1 || y == -1) return null
     return Pair(x, y)
+}
+
+fun shootAt(field: Array<IntArray>, row: Int, col: Int) {
+    when (field[row][col]) {
+        1 -> {
+            println("Попадание!")
+            Thread.sleep(500)
+            field[row][col] = 8
+        }
+
+        0, 2 -> {
+            println("Промах!")
+            Thread.sleep(500)
+            field[row][col] = 9
+        }
+
+        else -> {
+            println("Неверные координаты")
+            Thread.sleep(500)
+        }
+    }
 }
