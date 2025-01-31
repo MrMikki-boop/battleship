@@ -21,6 +21,11 @@ fun main() {
             shootAt(computerField, coordinates.first, coordinates.second)
             println("\nКомпьютер стреляет: ")
             printField(computerField)
+
+            if (isGameOver(computerField)) {
+                println("Вы победили! Поздравляем!")
+                break
+            }
         } else {
             println("Некорректные координаты")
         }
@@ -28,6 +33,12 @@ fun main() {
         printField(computerField)
 
         computerShoots(playerField)
+
+        if (isGameOver(playerField)) {
+            println("Вы проиграли! Скайнет победил.")
+            break
+        }
+
         printField(playerField)
     }
 }
@@ -177,3 +188,10 @@ fun toLetter(col: Int): Char {
     return letters[col]
 }
 
+fun isGameOver(field: Array<IntArray>): Boolean {
+    for (row in field) {
+        if (row.contains(1))
+            return false
+    }
+    return true
+}
