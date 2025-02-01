@@ -5,17 +5,29 @@ import kotlin.random.Random
 var cheatMode = false
 
 fun main() {
+    println("Добро пожаловать в игру \"Морской бой\"!")
+
+    do {
+        startGame()
+        println("Хотите сыграть ещё? (да/нет)")
+    } while (readlnOrNull()?.lowercase() == "да")
+
+    println("Спасибо за игру, Капитан!")
+}
+
+fun startGame() {
     val playerField = Array(10) { IntArray(10) { 0 } }
     val computerField = Array(10) { IntArray(10) { 0 } }
 
-    println("Добро пожаловать в игру \"Морской бой\"!")
+    cheatMode = false
 
     placeShips(playerField)
     placeShips(computerField)
 
     while (true) {
         printGameState(playerField, computerField)
-        println("Введите координаты для стрельбы (например, А1):")
+
+        println("\nВведите координаты для стрельбы (например, А1):")
         val input = readlnOrNull()?.trim() ?: ""
 
         if (input == "cheat") {
@@ -29,7 +41,7 @@ fun main() {
             shootAt(computerField, coordinates.first, coordinates.second)
 
             if (isGameOver(computerField)) {
-                println("Вы победили! Поздравляем!")
+                println("Вы победили! Поздравляем, Капитан!")
                 break
             }
         } else {
@@ -204,10 +216,5 @@ fun toLetter(col: Int): Char {
 }
 
 fun isGameOver(field: Array<IntArray>): Boolean {
-    for (row in field) {
-        if (row.contains(1)) {
-            return false
-        }
-    }
-    return true
+    return field.all { row -> row.none { it == 1 } }
 }
