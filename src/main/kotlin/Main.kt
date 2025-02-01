@@ -2,6 +2,8 @@ package org.example
 
 import kotlin.random.Random
 
+var cheatMode = false
+
 fun main() {
     val playerField = Array(10) { IntArray(10) { 0 } }
     val computerField = Array(10) { IntArray(10) { 0 } }
@@ -15,6 +17,12 @@ fun main() {
         printGameState(playerField, computerField)
         println("Введите координаты для стрельбы (например, А1):")
         val input = readlnOrNull()?.trim() ?: ""
+
+        if (input == "cheat") {
+            cheatMode = true
+            println("💀 Чит-режим активирован! \"Туман войны\" выключен.")
+            continue
+        }
 
         val coordinates = parseCoordinates(input)
         if (coordinates != null) {
@@ -42,6 +50,14 @@ fun main() {
     }
 }
 
+fun printGameState(playerField: Array<IntArray>, computerField: Array<IntArray>) {
+    println("\nВаше поле:")
+    printField(playerField, hideShips = false)
+
+    println("\nПоле противника:")
+    printField(computerField, hideShips = !cheatMode)
+}
+
 fun printField(field: Array<IntArray>, hideShips: Boolean = false) {
     val header = "    А Б В Г Д Е Ж З И К"
     println(header)
@@ -51,8 +67,8 @@ fun printField(field: Array<IntArray>, hideShips: Boolean = false) {
         for (cell in field[i]) {
             val symbol = when (cell) {
                 0 -> "." // пустая ячейка
-                1 -> if (hideShips) "." else "#" // корабль противника. Чтобы включить чит - заменить на: "1 -> "#""
-                2 -> "." // запретная зона (для отладки). TODO: убрать
+                1 -> if (hideShips) "." else "#" // корабль противника.
+                2 -> "." // запретная зона (для отладки).
                 8 -> "X" // попадание
                 9 -> "o" // промах
                 else -> "?"
@@ -194,12 +210,4 @@ fun isGameOver(field: Array<IntArray>): Boolean {
         }
     }
     return true
-}
-
-fun printGameState(playerField: Array<IntArray>, computerField: Array<IntArray>) {
-    println("\nВаше поле:")
-    printField(playerField, hideShips = false)
-
-    println("\nПоле противника:")
-    printField(computerField, hideShips = true)
 }
