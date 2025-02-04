@@ -181,6 +181,11 @@ fun shootAt(field: Array<IntArray>, row: Int, col: Int): Boolean {
             println("Попадание!")
             Thread.sleep(500)
             field[row][col] = 8
+
+            if (isShipSunk(field, row, col)) {
+                println("Корабль потоплен!")
+            }
+
             true
         }
 
@@ -215,6 +220,11 @@ fun computerShoots(field: Array<IntArray>): Boolean {
                 println("Компьютер попадает!")
                 Thread.sleep(500)
                 field[row][col] = 8
+
+                if (isShipSunk(field, row, col)) {
+                    println("Компьютер потопил ваш корабль!\n")
+                }
+
                 true
             }
 
@@ -232,6 +242,30 @@ fun computerShoots(field: Array<IntArray>): Boolean {
             }
         }
     }
+}
+
+fun isShipSunk(field: Array<IntArray>, row: Int, col: Int): Boolean {
+    val direction = listOf(
+        Pair(1, 0), Pair(-1, 0), Pair(0, 1), Pair(0, -1)
+    )
+
+    for ((dr, dc) in direction) {
+        var r = row
+        var c = col
+
+        while (r in 0..9 && c in 0..9) {
+            when (field[r][c]) {
+                1 -> return false
+                8 -> {
+                    r += dr
+                    c += dc
+                }
+                else -> return true
+            }
+        }
+    }
+
+    return true
 }
 
 fun toLetter(col: Int): Char {
