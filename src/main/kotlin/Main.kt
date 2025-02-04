@@ -45,8 +45,7 @@ fun startGame() {
 
                 val coordinates = parseCoordinates(input)
                 if (coordinates != null) {
-                    hit = shootAt(computerField, coordinates.first, coordinates.second)
-                    Thread.sleep(500)
+                    hit = shootAt(computerField, playerField, coordinates.first, coordinates.second)
                 } else {
                     println("Некорректные координаты")
                     hit = true
@@ -62,11 +61,11 @@ fun startGame() {
 
             var hit: Boolean
             do {
-                hit = computerShoots(playerField)
+                hit = computerShoots(playerField, computerField)
             } while (hit)
 
             if (isGameOver(playerField)) {
-                println("Вы проиграли! Скайнет победил.")
+                println("Вы проиграли! Скайнет восстал.")
                 break
             }
         }
@@ -95,6 +94,7 @@ fun printField(field: Array<IntArray>, hideShips: Boolean = false) {
                 0 -> "." // пустая ячейка
                 1 -> if (hideShips) "." else "#" // корабль противника.
                 2 -> "." // запретная зона (для отладки).
+                6 -> "S" // потопленный корабль
                 8 -> "X" // попадание
                 9 -> "o" // промах
                 else -> "?"
@@ -175,15 +175,17 @@ fun parseCoordinates(input: String): Pair<Int, Int>? {
     return Pair(y, x)
 }
 
-fun shootAt(field: Array<IntArray>, row: Int, col: Int): Boolean {
+fun shootAt(field: Array<IntArray>, enemyField: Array<IntArray>, row: Int, col: Int): Boolean {
     return when (field[row][col]) {
         1 -> {
             println("Попадание!")
-            Thread.sleep(500)
             field[row][col] = 8
 
             if (isShipSunk(field, row, col)) {
                 println("Корабль потоплен!")
+                markSunkShips(field, row, col)
+                Thread.sleep(500)
+                printGameState(enemyField, field)
             }
 
             true
@@ -191,38 +193,38 @@ fun shootAt(field: Array<IntArray>, row: Int, col: Int): Boolean {
 
         0, 2 -> {
             println("Промах!")
-            Thread.sleep(500)
             field[row][col] = 9
             false
         }
 
         else -> {
             println("Неверные координаты")
-            Thread.sleep(500)
             false
         }
     }
 }
 
-fun computerShoots(field: Array<IntArray>): Boolean {
+fun computerShoots(playerField: Array<IntArray>, computerField: Array<IntArray>): Boolean {
     while (true) {
         val row = Random.nextInt(10)
         val col = Random.nextInt(10)
 
-        if (field[row][col] == 8 || field[row][col] == 9) {
+        if (playerField[row][col] == 8 || playerField[row][col] == 9) {
             continue
         }
 
         println("Компьютер стреляет в ${toLetter(col)}${row + 1}")
 
-        return when (field[row][col]) {
+        return when (playerField[row][col]) {
             1 -> {
                 println("Компьютер попадает!")
-                Thread.sleep(500)
-                field[row][col] = 8
+                playerField[row][col] = 8
 
-                if (isShipSunk(field, row, col)) {
-                    println("Компьютер потопил ваш корабль!\n")
+                if (isShipSunk(playerField, row, col)) {
+                    println("Компьютер потопил ваш корабль!")
+                    markSunkShips(playerField, row, col)
+                    Thread.sleep(500)
+                    printGameState(playerField, computerField)
                 }
 
                 true
@@ -230,14 +232,12 @@ fun computerShoots(field: Array<IntArray>): Boolean {
 
             0, 2 -> {
                 println("Компьютер промахивается!")
-                Thread.sleep(500)
-                field[row][col] = 9
+                playerField[row][col] = 9
                 false
             }
 
             else -> {
                 println("Неверные координаты")
-                Thread.sleep(500)
                 false
             }
         }
@@ -266,6 +266,42 @@ fun isShipSunk(field: Array<IntArray>, row: Int, col: Int): Boolean {
     }
 
     return true
+}
+
+fun markSunkShips(field: Array<IntArray>, row: Int, col: Int) {
+    val direction = listOf(
+        Pair(1, 0), Pair(-1, 0), Pair(0, 1), Pair(0, -1)
+    )
+    val toMark = mutableListOf<Pair<Int, Int>>()
+
+    fun dfs(r: Int, c: Int) {
+        if (r !in 0..9 || c !in 0..9 || field[r][c] != 8) return
+        toMark.add(Pair(r, c))
+        field[r][c] = 7
+        for ((dr, dc) in direction) {
+            dfs(r + dr, c + dc)
+        }
+    }
+
+    dfs(row, col)
+
+    toMark.forEach { (r, c) ->
+        field[r][c] = 6
+    }
+
+    val offset = listOf(-1, 0, 1)
+    for ((r, c) in toMark) {
+        for (dr in offset) {
+            for (dc in offset) {
+                val nr = r + dr
+                val nc = c + dc
+
+                if (nr in 0..9 && nc in 0..9 && field[nr][nc] == 0) {
+                    field[nr][nc] = 9
+                }
+            }
+        }
+    }
 }
 
 fun toLetter(col: Int): Char {
