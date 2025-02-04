@@ -24,43 +24,56 @@ fun startGame() {
     placeShips(playerField)
     placeShips(computerField)
 
+    var playerTurn = true
+
     while (true) {
         printGameState(playerField, computerField)
 
-        println("\nВведите координаты для стрельбы (например, А1):")
-        val input = readlnOrNull()?.trim() ?: ""
+        if (playerTurn) {
+            var hit: Boolean
+            do {
+                println("\nВведите координаты для стрельбы (например, А1):")
+                val input = readlnOrNull()?.trim() ?: ""
 
-        if (input == "cheat") {
-            cheatMode = true
-            println("💀 Чит-режим активирован! \"Туман войны\" выключен.")
-            continue
-        }
+                if (input == "cheat") {
+                    cheatMode = true
+                    println("💀 Чит-режим активирован! \"Туман войны\" выключен.")
+                    hit = true
+                    continue
+                }
 
-        val coordinates = parseCoordinates(input)
-        if (coordinates != null) {
-            shootAt(computerField, coordinates.first, coordinates.second)
-
+                val coordinates = parseCoordinates(input)
+                if (coordinates != null) {
+                    hit = shootAt(computerField, coordinates.first, coordinates.second)
+                    Thread.sleep(500)
+                } else {
+                    println("Некорректные координаты")
+                    hit = true
+                }
+            } while (hit)
             if (isGameOver(computerField)) {
                 println("Вы победили! Поздравляем, Капитан!")
                 break
             }
         } else {
-            println("Некорректные координаты")
-            continue
+            println("Нажмите Enter, чтобы продолжить...")
+            readln()
+
+            var hit: Boolean
+            do {
+                hit = computerShoots(playerField)
+            } while (hit)
+
+            if (isGameOver(playerField)) {
+                println("Вы проиграли! Скайнет победил.")
+                break
+            }
         }
 
-        printGameState(playerField, computerField)
-
-        computerShoots(playerField)
-
-        if (isGameOver(playerField)) {
-            println("Вы проиграли! Скайнет победил.")
-            break
-        }
-
-        printGameState(playerField, computerField)
+        playerTurn = !playerTurn
     }
 }
+
 
 fun printGameState(playerField: Array<IntArray>, computerField: Array<IntArray>) {
     println("\nВаше поле:")
@@ -161,28 +174,31 @@ fun parseCoordinates(input: String): Pair<Int, Int>? {
     return Pair(y, x)
 }
 
-fun shootAt(field: Array<IntArray>, row: Int, col: Int) {
-    when (field[row][col]) {
+fun shootAt(field: Array<IntArray>, row: Int, col: Int): Boolean {
+    return when (field[row][col]) {
         1 -> {
             println("Попадание!")
             Thread.sleep(500)
             field[row][col] = 8
+            true
         }
 
         0, 2 -> {
             println("Промах!")
             Thread.sleep(500)
             field[row][col] = 9
+            false
         }
 
         else -> {
             println("Неверные координаты")
             Thread.sleep(500)
+            false
         }
     }
 }
 
-fun computerShoots(field: Array<IntArray>) {
+fun computerShoots(field: Array<IntArray>): Boolean {
     while (true) {
         val row = Random.nextInt(10)
         val col = Random.nextInt(10)
@@ -193,20 +209,27 @@ fun computerShoots(field: Array<IntArray>) {
 
         println("Компьютер стреляет в ${toLetter(col)}${row + 1}")
 
-        when (field[row][col]) {
+        return when (field[row][col]) {
             1 -> {
                 println("Компьютер попадает!")
                 Thread.sleep(500)
                 field[row][col] = 8
+                true
             }
 
             0, 2 -> {
                 println("Компьютер промахивается!")
                 Thread.sleep(500)
                 field[row][col] = 9
+                false
+            }
+
+            else -> {
+                println("Неверные координаты")
+                Thread.sleep(500)
+                false
             }
         }
-        break
     }
 }
 
