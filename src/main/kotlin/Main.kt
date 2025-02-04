@@ -38,6 +38,7 @@ fun startGame() {
                 if (input == "cheat") {
                     cheatMode = true
                     println("💀 Чит-режим активирован! \"Туман войны\" выключен.")
+                    printGameState(playerField, computerField)
                     hit = true
                     continue
                 }
