@@ -69,7 +69,7 @@ fun startGame() {
 
             var hit: Boolean
             do {
-                hit = computerShoots(playerField, computerField)
+                hit = computerShoots(playerField)
             } while (hit)
 
             if (isGameOver(playerField)) {
@@ -206,7 +206,7 @@ fun shootAt(field: Array<IntArray>, enemyField: Array<IntArray>, row: Int, col: 
         }
         8, 9 -> {
             println("Вы уже стреляли в эту клетку")
-            false
+            true
         }
         else -> {
             println("Неверные координаты")
@@ -218,7 +218,7 @@ fun shootAt(field: Array<IntArray>, enemyField: Array<IntArray>, row: Int, col: 
 var computerLastHit: Pair<Int, Int>? = null
 var computerPossibleTargets = mutableListOf<Pair<Int, Int>>()
 
-fun computerShoots(playerField: Array<IntArray>, computerField: Array<IntArray>): Boolean {
+fun computerShoots(playerField: Array<IntArray>): Boolean {
     var target: Pair<Int, Int>? = null
 
     if (computerPossibleTargets.isNotEmpty()) {
