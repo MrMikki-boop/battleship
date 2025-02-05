@@ -43,6 +43,14 @@ fun startGame() {
                     continue
                 }
 
+                if (input == "uncheat") {
+                    cheatMode = false
+                    println("🔒 Чит-режим отключён. \"Туман войны\" восстановлен.")
+                    printGameState(playerField, computerField)
+                    hit = true
+                    continue
+                }
+
                 val coordinates = parseCoordinates(input)
                 if (coordinates != null) {
                     hit = shootAt(computerField, playerField, coordinates.first, coordinates.second)
@@ -190,14 +198,16 @@ fun shootAt(field: Array<IntArray>, enemyField: Array<IntArray>, row: Int, col: 
 
             true
         }
-
         0, 2 -> {
             println("Промах!")
             Thread.sleep(500)
             field[row][col] = 9
             false
         }
-
+        8, 9 -> {
+            println("Вы уже стреляли в эту клетку")
+            false
+        }
         else -> {
             println("Неверные координаты")
             true
@@ -271,7 +281,6 @@ fun computerShoots(playerField: Array<IntArray>, computerField: Array<IntArray>)
                 computerPossibleTargets.clear()
                 computerLastHit = null
                 Thread.sleep(500)
-                printGameState(playerField, computerField)
             } else {
                 computerLastHit = Pair(row, col)
                 val direction = listOf(Pair(row - 1, col), Pair(row + 1, col), Pair(row, col - 1), Pair(row, col + 1))
