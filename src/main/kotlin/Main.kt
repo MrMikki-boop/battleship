@@ -200,7 +200,7 @@ fun shootAt(field: Array<IntArray>, enemyField: Array<IntArray>, row: Int, col: 
 
         else -> {
             println("Неверные координаты")
-            false
+            true
         }
     }
 }
@@ -213,7 +213,8 @@ fun computerShoots(playerField: Array<IntArray>, computerField: Array<IntArray>)
 
     if (computerPossibleTargets.isNotEmpty()) {
         target = computerPossibleTargets.removeAt(0)
-    } else if (computerLastHit != null) {
+    }
+    else if (computerLastHit != null) {
         val (r, c) = computerLastHit!!
 
         val neighbors = listOf(
@@ -227,6 +228,22 @@ fun computerShoots(playerField: Array<IntArray>, computerField: Array<IntArray>)
 
         if (computerPossibleTargets.isNotEmpty()) {
             target = computerPossibleTargets.removeAt(0)
+        }
+    }
+
+    if (target == null) {
+        val candidates = mutableListOf<Pair<Int, Int>>()
+
+        for (row in 0..9) {
+            for (col in 0..9) {
+                if ((row + col) % 2 == 0 && playerField[row][col] == 0) {
+                    candidates.add(Pair(row, col))
+                }
+            }
+        }
+
+        if (candidates.isNotEmpty()) {
+            target = candidates.random()
         }
     }
 
@@ -254,7 +271,7 @@ fun computerShoots(playerField: Array<IntArray>, computerField: Array<IntArray>)
                 computerPossibleTargets.clear()
                 computerLastHit = null
                 Thread.sleep(500)
-                printGameState(computerField, playerField)
+                printGameState(playerField, computerField)
             } else {
                 computerLastHit = Pair(row, col)
                 val direction = listOf(Pair(row - 1, col), Pair(row + 1, col), Pair(row, col - 1), Pair(row, col + 1))
@@ -273,7 +290,10 @@ fun computerShoots(playerField: Array<IntArray>, computerField: Array<IntArray>)
             false
         }
         else -> {
-            println("Неверные координаты")
+            computerPossibleTargets.remove(target)
+            if (computerPossibleTargets.isEmpty()) {
+                computerLastHit = null
+            }
             false
         }
     }
