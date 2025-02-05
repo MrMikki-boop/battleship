@@ -212,37 +212,35 @@ fun computerShoots(playerField: Array<IntArray>, computerField: Array<IntArray>)
     var target: Pair<Int, Int>? = null
 
     if (computerPossibleTargets.isNotEmpty()) {
-        target = computerPossibleTargets.random()
+        target = computerPossibleTargets.removeAt(0)
     } else if (computerLastHit != null) {
         val (r, c) = computerLastHit!!
 
         val neighbors = listOf(
             Pair(r - 1, c), Pair(r + 1, c), Pair(r, c - 1), Pair(r, c + 1)
         )
-        for (n in neighbors) {
-            val (nr, nc) = n
-            if (nr in 0..9 && nc in 0..9 && computerField[nr][nc] != 8 && computerField[nr][nc] != 9) {
-                computerPossibleTargets.add(n)
+        for ((nr, nc) in neighbors) {
+            if (nr in 0..9 && nc in 0..9 && playerField[nr][nc] == 1) {
+                computerPossibleTargets.add(Pair(nr, nc))
             }
         }
+
         if (computerPossibleTargets.isNotEmpty()) {
-            target = computerPossibleTargets.random()
+            target = computerPossibleTargets.removeAt(0)
         }
     }
 
     if (target == null) {
-        while (true) {
+        do {
             val row = Random.nextInt(10)
             val col = Random.nextInt(10)
-            if (playerField[row][col] != 8 && playerField[row][col] != 9) {
+            if (playerField[row][col] !in listOf(8, 9)) {
                 target = Pair(row, col)
-                break
             }
-        }
+        } while (target == null)
     }
 
-    val (row, col) = target!!
-
+    val (row, col) = target
     println("Компьютер стреляет в ${toLetter(col)}${row + 1}")
 
     val result = when (playerField[row][col]) {
@@ -250,12 +248,21 @@ fun computerShoots(playerField: Array<IntArray>, computerField: Array<IntArray>)
             println("Компьютер попадает!")
             playerField[row][col] = 8
             Thread.sleep(500)
-            true
             if (isShipSunk(playerField, row, col)) {
                 println("Компьютер потопил корабль!")
                 markSunkShips(playerField, row, col)
+                computerPossibleTargets.clear()
+                computerLastHit = null
                 Thread.sleep(500)
                 printGameState(computerField, playerField)
+            } else {
+                computerLastHit = Pair(row, col)
+                val direction = listOf(Pair(row - 1, col), Pair(row + 1, col), Pair(row, col - 1), Pair(row, col + 1))
+                for ((nr, nc) in direction) {
+                    if (nr in 0..9 && nc in 0..9 && playerField[nr][nc] !in listOf(8, 9)) {
+                        computerPossibleTargets.add(Pair(nr, nc))
+                    }
+                }
             }
             true
         }
@@ -301,16 +308,13 @@ fun isShipSunk(field: Array<IntArray>, row: Int, col: Int): Boolean {
         var r = row
         var c = col
 
-        while (r in 0..9 && c in 0..9) {
-            when (field[r][c]) {
-                1 -> return false
-                8 -> {
-                    r += dr
-                    c += dc
-                }
+        while (r in 0..9 && c in 0..9 && field[r][c] == 8) {
+            r += dr
+            c += dc
+        }
 
-                else -> return true
-            }
+        if (r in 0..9 && c in 0..9 && field[r][c] == 1) {
+            return false
         }
     }
 
