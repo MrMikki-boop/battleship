@@ -57,7 +57,7 @@ fun startGame() {
             }
         } else {
             println("Нажмите Enter, чтобы продолжить...")
-            readln()
+            readln().trim()
 
             var hit: Boolean
             do {
@@ -260,6 +260,7 @@ fun isShipSunk(field: Array<IntArray>, row: Int, col: Int): Boolean {
                     r += dr
                     c += dc
                 }
+
                 else -> return true
             }
         }
@@ -286,7 +287,7 @@ fun markSunkShips(field: Array<IntArray>, row: Int, col: Int) {
     dfs(row, col)
 
     toMark.forEach { (r, c) ->
-        field[r][c] = 6
+        field[r][c] = 8
     }
 
     val offset = listOf(-1, 0, 1)
